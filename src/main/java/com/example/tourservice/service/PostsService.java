@@ -2,6 +2,7 @@ package com.example.tourservice.service;
 
 import com.example.tourservice.domain.posts.Posts;
 import com.example.tourservice.domain.posts.PostsRepository;
+import com.example.tourservice.web.dto.PostsResponseDto;
 import com.example.tourservice.web.dto.PostsSaveRequestDto;
 import com.example.tourservice.web.dto.PostsUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,12 @@ public class PostsService {
         posts.update(requestDto.getTitle(),requestDto.getCost(),requestDto.getContent());
 
         return id;
+    }
+
+    public PostsResponseDto findById(Long id){
+        Posts entity = postsRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+id));
+
+        return new PostsResponseDto(entity);
     }
 }

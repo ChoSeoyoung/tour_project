@@ -427,3 +427,56 @@ assertThat(posts.getTitle()).isEqualTo(updatetitle);
 assertThat(posts.getContent()).isEqualTo(updatecontent);
 }
 ```
+
+### 조회
+
+```java
+@RequiredArgsConstructor
+@RestController
+public class PostsApiController {
+    private final PostsService postsService;
+    ...
+    @GetMapping("api/v1/posts/{id}")
+    public PostsResponseDto findById(@PathVariable Long id){
+        return postsService.findById(id);
+    }
+}
+
+```
+
+```java
+@RequiredArgsConstructor
+@Service
+public class PostsService {
+    private final PostsRepository postsRepository;
+
+...
+
+    public PostsResponseDto findById(Long id){
+        Posts entity = postsRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+id));
+
+        return new PostsResponseDto(entity);
+    }
+}
+
+```
+
+```java
+@Getter
+public class PostsResponseDto {
+    private Long id;
+    private String title;
+    private int cost;
+    private String content;
+
+    public PostsResponseDto(Posts entity){
+        this.id=entity.getPostId();
+        this.title=entity.getTitle();
+        this.cost=entity.getCost();
+        this.content=entity.getContent();
+    }
+}
+
+```
+
