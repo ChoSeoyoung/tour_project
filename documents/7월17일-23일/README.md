@@ -145,3 +145,157 @@ public class PostsRepositoryTest {
 **@postsRepository.findAll**
 
 - 테이블 posts에 있는 모든 데아터를 조회해오는 메소드이다.
+
+## Posts, 게시글
+
+### 등록
+
+```java
+@RequiredArgsConstructor
+@RestController
+public class PostsApiController {
+    private final PostsService postsService;
+
+    @PostMapping("api/v1/posts")
+    public Long save(@RequestBody PostsSaveRequestDto requestDto){
+        return postsService.save(requestDto);
+    }
+}
+```
+
+**@RestContorller**
+
+- 컨트롤러를 JSON을 반환하는 컨트롤러로 만들어 준다.
+- @ResponseBody를 각 메소드마다 선언했던 것을 한번에 사용할 수 있게된 것과 같다.
+
+```java
+@RequiredArgsConstructor
+@Service
+public class PostsService {
+    private final PostsRepository postsRepository;
+
+    @Transactional
+    public Long save(PostsSaveRequestDto requestDto){
+        return postsRepository.save(requestDto.toEntity()).getPostId();
+    }
+}
+```
+
+```java
+@Getter
+@NoArgsConstructor
+public class PostsSaveRequestDto {
+    private String title;
+    private int cost;
+    private String content;
+
+    @Builder
+    public PostsSaveRequestDto(String title, Integer cost, String content) {
+        this.title=title;
+        this.cost=cost;
+        this.content=content;
+    }
+
+    public Posts toEntity(){
+        return Posts.builder()
+                .title(title)
+                .cost(cost)
+                .content(content)
+                .build();
+    }
+}
+```
+
+![Untitled]([https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6428b9e1-c8b5-4a31-85c0-fec6315e5f4b/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6428b9e1-c8b5-4a31-85c0-fec6315e5f4b/Untitled.png))
+
+---
+
+앞서 Spring의 동작 순서는 다음과 같다고 했다.
+
+Spring의 동작순서는 다음과 같다.
+
+1.클라이언트가 Request 요청을 하면 DispatcherServlet이 요청을 받는다.
+
+2.DispatcherServlet에서 받은 요청을 HandlerMapping에게 보내 해당 요청을 처리할 수 있는 Controller를 찾는다.
+
+3.실제 로직 처리(**Controller→Service→DAO→DB→Service→Controller**)
+
+4.로직 처리 후 ViewResolver를 통해 view 화면을 찾는다.
+
+5.View 화면을 최종 클라이언트에게 전송한다.
+
+※[https://github.com/ChoSeoyoung/tour_project/tree/main/documents/7월10일-16일](https://github.com/ChoSeoyoung/tour_project/tree/main/documents/7%EC%9B%9410%EC%9D%BC-16%EC%9D%BC)
+
+※[https://gmlwjd9405.github.io/2018/12/25/difference-dao-dto-entity.html](https://gmlwjd9405.github.io/2018/12/25/difference-dao-dto-entity.html)
+
+![Untitled](spring%20%E1%84%89%E1%85%B3%E1%84%90%E1%85%A5%E1%84%83%E1%85%B53%20419fe2da8f934e87866c9ee4da74dcdb/Untitled%201.png)
+
+### DAO(Data Access Object)
+
+- 실제로 DB에 접근하는 객체
+- Service와 DB를 연결하는 역할
+- SQL을 사용하여 DB에 접근한 후 적절한 API 제공
+
+### DTO(Data Transfer Object)
+
+- 계층간 데이터 교환을 위한 객체(Java Beans)이다.
+- Request와 Response용 DTO는 View를 위한 클래스이다.
+    - toEntity()메서드를 통해서 DTO에 필요한 부분을 이용하여  Entity로 만든다.
+
+---
+
+<테스트코드>
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class PostsApiControllerTest {
+    @LocalServerPort
+    private int port;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Autowired
+    private PostsRepository postsRepository;
+
+    @After
+    public void testDown() throws Exception{
+        postsRepository.deleteAll();
+    }
+
+    @Test
+    public void Posts_등록된다() throws Exception {
+        //given
+        String title="title";
+        int cost=999;
+        String content="content";
+
+        PostsSaveRequestDto requestDto = PostsSaveRequestDto.builder()
+                .title(title)
+                .cost(cost)
+                .content(content)
+                .build();
+
+        String url = "http://localhost:"+port+"/api/v1/posts";
+
+        //when
+        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(url,requestDto,Long.class);
+
+        //then
+assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+assertThat(responseEntity.getBody()).isGreaterThan(0L);
+        // 0L은 Long형 값을 비교할때 0보다 0L이라고 사용한다. (L이라고 뒤에 붙은 것은 명시적으로 Long형 값이란 의미)
+
+        List<Posts> postsList = postsRepository.findAll();
+        Posts posts = postsList.get(0);
+assertThat(posts.getTitle()).isEqualTo(title);
+assertThat(posts.getContent()).isEqualTo(content);
+    }
+}
+```
+
+@RunWith(SpringRunner.class)
+
+- 테스트를 진행할 때 JUnit에 내장된 실행자 외에 다른 실행자를 실행시킨다.
+- SpringRunner라는 실행자를 사용함으로써, 스프링 부트 테스트와 JUnit 사이에 연결자 역할을 한다.
