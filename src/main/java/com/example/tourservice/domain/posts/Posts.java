@@ -29,4 +29,10 @@ public class Posts {
         this.cost = cost;
         this.content = content;
     }
+
+    public void update(String title, Integer cost, String content){
+        this.title=title;
+        this.cost=cost;
+        this.content=content;
+    }
 }

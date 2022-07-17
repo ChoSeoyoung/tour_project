@@ -3,6 +3,7 @@ package com.example.tourservice.web;
 import com.example.tourservice.domain.posts.Posts;
 import com.example.tourservice.domain.posts.PostsRepository;
 import com.example.tourservice.web.dto.PostsSaveRequestDto;
+import com.example.tourservice.web.dto.PostsUpdateRequestDto;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -64,5 +67,47 @@ public class PostsApiControllerTest {
         Posts posts = postsList.get(0);
         assertThat(posts.getTitle()).isEqualTo(title);
         assertThat(posts.getContent()).isEqualTo(content);
+    }
+
+    @Test
+    public void Posts_수정된다() throws Exception {
+        //given
+        String title="title1";
+        int cost=999;
+        String content="content1";
+
+        Posts savedPosts = postsRepository.save(Posts.builder()
+                .title(title)
+                .cost(cost)
+                .content(content)
+                .build());
+
+        Long updateId = savedPosts.getPostId();
+        String updatetitle="title2";
+        int updatecost=1000;
+        String updatecontent="content2";
+
+        PostsUpdateRequestDto requestDto = PostsUpdateRequestDto.builder()
+                .title(updatetitle)
+                .cost(updatecost)
+                .content(updatecontent)
+                .build();
+
+        String url = "http://localhost:"+port+"/api/v1/posts/"+updateId;
+
+        HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(requestDto);
+
+        //when
+        ResponseEntity<Long> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, requestEntity,Long.class);
+
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isGreaterThan(0L);
+
+
+        List<Posts> postsList = postsRepository.findAll();
+        Posts posts = postsList.get(0);
+        assertThat(posts.getTitle()).isEqualTo(updatetitle);
+        assertThat(posts.getContent()).isEqualTo(updatecontent);
     }
 }

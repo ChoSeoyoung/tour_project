@@ -181,6 +181,12 @@ public class PostsService {
 }
 ```
 
+**@Transactional**
+
+CRUD 중 C,U,D의 메소드 위에 붙여서 사용한다. 트랜잭션은 원자성, 일관성, 격리성, 영속성의 4가지 성질을 가진다.
+
+※[https://velog.io/@kdhyo/JavaTransactional-Annotation-알고-쓰자-26her30h](https://velog.io/@kdhyo/JavaTransactional-Annotation-%EC%95%8C%EA%B3%A0-%EC%93%B0%EC%9E%90-26her30h)
+
 ```java
 @Getter
 @NoArgsConstructor
@@ -299,3 +305,125 @@ assertThat(posts.getContent()).isEqualTo(content);
 
 - 테스트를 진행할 때 JUnit에 내장된 실행자 외에 다른 실행자를 실행시킨다.
 - SpringRunner라는 실행자를 사용함으로써, 스프링 부트 테스트와 JUnit 사이에 연결자 역할을 한다.
+
+### 수정
+
+```java
+@RequiredArgsConstructor
+@RestController
+public class PostsApiController {
+    ...
+    @PutMapping("api/v1/posts/{id}")
+    public Long update(@PathVariable Long id, @RequestBody PostsUpdateRequestDto requestDto){
+        return PostsService.update(id, requestDto);
+    }
+}
+```
+
+**@PathVariable Long id**
+
+…/posts/{id}의 url을 요청받으면 기본적으로 String으로 받지만, @PathVariable Long id을 통해서 ****Long타입으로 자동 형변환된다.
+
+```java
+@RequiredArgsConstructor
+@Service
+public class PostsService {
+    private final PostsRepository postsRepository;
+
+   ...
+
+    @Transactional
+    public Long update(Long id, PostsUpdateRequestDto requestDto){
+        Posts posts = postsRepository.findById(id)
+                .orElseThrow(()->new IllegalArgumentException("해당 게시글이 없습니다. id="+id));
+
+        posts.update(requestDto.getTitle(),requestDto.getCost(),requestDto.getContent());
+
+        return id;
+    }
+}
+```
+
+```
+@Getter
+@NoArgsConstructor
+@Entity
+public class Posts {
+    ...
+    public void update(String title, Integer cost, String content){
+        this.title=title;
+        this.cost=cost;
+        this.content=content;
+    }
+}
+```
+
+update 기능에서 데이터베이스에 쿼리를 날리는 부분이 없다. 이는 **JPA 영속성 컨텍스트** 때문이다. **영속성 컨텍스트란, 엔티티를 영구 저장하는 환경**이다.
+
+트랜잭션 안에서 데이터베이스에서 데이터를 가져오면 이 데이터는 영속성 컨텍스트가 유지된 상태이다. 이 상태에서 해당 데이터의 값을 변경하면 **트랜잭션이 끝나는 시점에 해당 테이블에 변경분을 반영**한다. 
+
+즉, JPA에서는 트랜잭션이 끝나는 시점에 **변화가 있는 모든 엔티티 객체**를 데이터베이스에 자동으로 반영해준다.
+
+※[https://jojoldu.tistory.com/415](https://jojoldu.tistory.com/415)
+
+```java
+@Getter
+@NoArgsConstructor
+public class PostsUpdateRequestDto {
+    private String title;
+    private int cost;
+    private String content;
+
+    @Builder
+    public PostsUpdateRequestDto(String title, Integer cost, String content) {
+        this.title = title;
+        this.cost = cost;
+        this.content = content;
+    }
+}
+```
+
+<테스트코드>
+
+```
+@Test
+public void Posts_수정된다() throws Exception {
+    //given
+    String title="title1";
+    int cost=999;
+    String content="content1";
+
+    Posts savedPosts = postsRepository.save(Posts.builder()
+            .title(title)
+            .cost(cost)
+            .content(content)
+            .build());
+
+    Long updateId = savedPosts.getPostId();
+    String updatetitle="title2";
+    int updatecost=1000;
+    String updatecontent="content2";
+
+    PostsUpdateRequestDto requestDto = PostsUpdateRequestDto.builder()
+            .title(updatetitle)
+            .cost(updatecost)
+            .content(updatecontent)
+            .build();
+
+    String url = "http://localhost:"+port+"/api/v1/posts/"+updateId;
+
+    HttpEntity<PostsUpdateRequestDto> requestEntity = new HttpEntity<>(requestDto);
+
+    //when
+    ResponseEntity<Long> responseEntity = restTemplate.exchange(url, HttpMethod.PUT, requestEntity,Long.class);
+
+    //then
+assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+assertThat(responseEntity.getBody()).isGreaterThan(0L);
+
+    List<Posts> postsList = postsRepository.findAll();
+    Posts posts = postsList.get(0);
+assertThat(posts.getTitle()).isEqualTo(updatetitle);
+assertThat(posts.getContent()).isEqualTo(updatecontent);
+}
+```
