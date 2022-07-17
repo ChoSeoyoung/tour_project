@@ -212,7 +212,8 @@ public class PostsSaveRequestDto {
 }
 ```
 
-![Untitled]([https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6428b9e1-c8b5-4a31-85c0-fec6315e5f4b/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6428b9e1-c8b5-4a31-85c0-fec6315e5f4b/Untitled.png))
+![image](https://user-images.githubusercontent.com/74875490/179398556-2acd2e72-5f8f-46f6-a9e1-835e6ddfa7d8.png)
+<br>
 
 ---
 
@@ -234,7 +235,8 @@ Spring의 동작순서는 다음과 같다.
 
 ※[https://gmlwjd9405.github.io/2018/12/25/difference-dao-dto-entity.html](https://gmlwjd9405.github.io/2018/12/25/difference-dao-dto-entity.html)
 
-![Untitled](spring%20%E1%84%89%E1%85%B3%E1%84%90%E1%85%A5%E1%84%83%E1%85%B53%20419fe2da8f934e87866c9ee4da74dcdb/Untitled%201.png)
+![image](https://user-images.githubusercontent.com/74875490/179398574-96bcb727-c124-498b-b623-0ab147cf5415.png)
+<br>
 
 ### DAO(Data Access Object)
 
