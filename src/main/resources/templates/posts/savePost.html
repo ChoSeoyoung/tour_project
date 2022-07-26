@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Post</title>
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h1>Add Post</h1>
+    </div>
+    <hr>
+    <form>
+        <div class="form-group">
+            <label>title</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="title">
+        </div>
+        <div class="form-group">
+            <label>cost</label>
+            <input type="text" class="form-control" id="cost" name="cost" placeholder="cost">
+        </div>
+        <div class="form-group">
+            <label>content</label>
+            <input type="text" class="form-control" id="content" name="content" placeholder="content">
+        </div>
+        <br>
+        <button type="button" class="btn btn-primary" id="btn-save">등록</button>
+        <button onclick="location.href='../'"
+                type="button" class="btn btn-secondary">취소</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="../../js/posts.js"></script>
+</div>
+</body>
+</html>

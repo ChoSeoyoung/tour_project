@@ -1,4 +1,4 @@
-package com.example.tourservice.web.dto;
+package com.example.tourservice.web.dto.Posts;
 
 import com.example.tourservice.domain.posts.Posts;
 import lombok.Builder;

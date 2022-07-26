@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>posts list</title>
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h1>posts list</h1>
+    </div>
+    <hr>
+    <a href="./save">글 등록</a>
+    <form method="post">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>title</th>
+                <th>cost</th>
+                <th>content</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post : ${posts}">
+                <td><a th:text="${post.id}">1</a></td>
+                <td><a th:text="${post.title}">테스트 목록1</a></td>
+                <td th:text="${post.cost}">테스트 비용1</td>
+                <td th:text="${post.content}">테스트 내용1</td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+</body>
+</html>

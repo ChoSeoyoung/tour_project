@@ -2,9 +2,8 @@ package com.example.tourservice.web;
 
 import com.example.tourservice.domain.posts.Posts;
 import com.example.tourservice.domain.posts.PostsRepository;
-import com.example.tourservice.web.dto.PostsSaveRequestDto;
-import com.example.tourservice.web.dto.PostsUpdateRequestDto;
-import org.assertj.core.api.Assertions;
+import com.example.tourservice.web.dto.Posts.PostsSaveRequestDto;
+import com.example.tourservice.web.dto.Posts.PostsUpdateRequestDto;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)

@@ -1,9 +1,9 @@
 package com.example.tourservice.web;
 
 import com.example.tourservice.service.PostsService;
-import com.example.tourservice.web.dto.PostsResponseDto;
-import com.example.tourservice.web.dto.PostsSaveRequestDto;
-import com.example.tourservice.web.dto.PostsUpdateRequestDto;
+import com.example.tourservice.web.dto.Posts.PostsResponseDto;
+import com.example.tourservice.web.dto.Posts.PostsSaveRequestDto;
+import com.example.tourservice.web.dto.Posts.PostsUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
